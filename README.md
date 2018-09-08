@@ -1,22 +1,24 @@
-# go-electrum [![GoDoc](https://godoc.org/github.com/d4l3k/go-electrum?status.svg)](https://godoc.org/github.com/d4l3k/go-electrum)
+# go-electrum [![GoDoc](https://godoc.org/github.com/qshuai/go-electrum?status.svg)](https://godoc.org/github.com/qshuai/go-electrum)
+This repository is a fork of [d4l3k/go-electrum](https://github.com/d4l3k/go-electrum) that is unmaintained now. 
+
 A pure Go [Electrum](https://electrum.org/) bitcoin library. This makes it easy to write bitcoin based services using Go without having to run a full bitcoin node.
 
-![go-electrum](https://rawgit.com/d4l3k/go-electrum/master/media/logo.png)
+![go-electrum](https://rawgit.com/qshuai/go-electrum/master/media/logo.png)
 
 This is very much WIP and has a number of unimplemented methods. This will eventually be rewritten into a more Go-esque library and handle wallet generation.
 
 Packages provided
 
-* [electrum](https://godoc.org/github.com/d4l3k/go-electrum/electrum) - Library for using JSON-RPC to talk directly to Electrum servers.
-* [wallet](https://godoc.org/github.com/d4l3k/go-electrum/wallet) - A bitcoin wallet built on [btcwallet](https://github.com/btcsuite/btcwallet) with Electrum as the backend.
-* [irc](https://godoc.org/github.com/d4l3k/go-electrum/irc) - A helper module for finding electrum servers using the [#electrum IRC channel](http://docs.electrum.org/en/latest/protocol.html?highlight=irc#server-peers-subscribe) on Freenode.
+* [electrum](https://godoc.org/github.com/qshuai/go-electrum/electrum) - Library for using JSON-RPC to talk directly to Electrum servers.
+* [wallet](https://godoc.org/github.com/qshuai/go-electrum/wallet) - A bitcoin wallet built on [btcwallet](https://github.com/btcsuite/btcwallet) with Electrum as the backend.
+* [irc](https://godoc.org/github.com/qshuai/go-electrum/irc) - A helper module for finding electrum servers using the [#electrum IRC channel](http://docs.electrum.org/en/latest/protocol.html?highlight=irc#server-peers-subscribe) on Freenode.
 
 ## Usage
-See [example/](https://github.com/d4l3k/go-electrum/tree/master/example) for more.
+See [example/](https://github.com/qshuai/go-electrum/tree/master/example) for more.
 
-### electrum [![GoDoc](https://godoc.org/github.com/d4l3k/go-electrum/electrum?status.svg)](https://godoc.org/github.com/d4l3k/go-electrum/electrum)
+### electrum [![GoDoc](https://godoc.org/github.com/qshuai/go-electrum/electrum?status.svg)](https://godoc.org/github.com/qshuai/go-electrum/electrum)
 ```bash
-$ go get -u github.com/d4l3k/go-electrum/electrum
+$ go get -u github.com/qshuai/go-electrum/electrum
 ```
 
 ```go
@@ -25,7 +27,7 @@ package main
 import (
   "log"
 
-  "github.com/d4l3k/go-electrum/electrum"
+  "github.com/qshuai/go-electrum/electrum"
 )
 
 func main() {
@@ -41,10 +43,10 @@ func main() {
 }
 ```
 
-### wallet [![GoDoc](https://godoc.org/github.com/d4l3k/go-electrum/wallet?status.svg)](https://godoc.org/github.com/d4l3k/go-electrum/wallet)
+### wallet [![GoDoc](https://godoc.org/github.com/qshuai/go-electrum/wallet?status.svg)](https://godoc.org/github.com/qshuai/go-electrum/wallet)
 
 ```bash
-$ go get -u github.com/d4l3k/go-electrum/wallet
+$ go get -u github.com/qshuai/go-electrum/wallet
 ```
 
 ```go
@@ -54,7 +56,7 @@ import (
   "log"
 
   "github.com/btcsuite/btcutil"
-  "github.com/d4l3k/go-electrum/wallet"
+  "github.com/qshuai/go-electrum/wallet"
 )
 
 func main() {
@@ -80,9 +82,9 @@ func main() {
 }
 ```
 
-### irc [![GoDoc](https://godoc.org/github.com/d4l3k/go-electrum/irc?status.svg)](https://godoc.org/github.com/d4l3k/go-electrum/irc)
+### irc [![GoDoc](https://godoc.org/github.com/qshuai/go-electrum/irc?status.svg)](https://godoc.org/github.com/qshuai/go-electrum/irc)
 ```bash
-$ go get -u github.com/d4l3k/go-electrum/irc
+$ go get -u github.com/qshuai/go-electrum/irc
 ```
 
 ```go
@@ -91,15 +93,13 @@ package main
 import (
 	"log"
 
-	"github.com/d4l3k/go-electrum/irc"
+	"github.com/qshuai/go-electrum/irc"
 )
 
 func main() {
 	log.Println(irc.FindElectrumServers())
 }
 ```
-
-
 
 # License
 go-electrum is licensed under the MIT license.
