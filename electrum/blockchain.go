@@ -14,7 +14,7 @@ func (n *Node) BlockchainNumBlocksSubscribe() (int, error) {
 	resp := &struct {
 		Result int `json:"result"`
 	}{}
-	err := n.request("blockchain.numblocks.subscribe", nil, resp)
+	err := n.request("blockchain.numblocks.subscribe", []string{}, resp)
 	return resp.Result, err
 }
 
@@ -36,7 +36,7 @@ func (n *Node) BlockchainHeadersSubscribe() (<-chan *BlockchainHeader, error) {
 	resp := &struct {
 		Result *BlockchainHeader `json:"result"`
 	}{}
-	if err := n.request("blockchain.headers.subscribe", nil, resp); err != nil {
+	if err := n.request("blockchain.headers.subscribe", []string{}, resp); err != nil {
 		return nil, err
 	}
 	headerChan := make(chan *BlockchainHeader, 1)

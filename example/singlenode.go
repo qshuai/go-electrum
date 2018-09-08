@@ -2,13 +2,21 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/d4l3k/go-electrum/electrum"
 )
 
+var (
+	// Should specify a available server(IP:PORT)
+	serverAddr = "39.104.125.149:9629"
+
+	bitcoinAddress = "n4FyJMDYXJmPEm7cffFLrwLXvGWn8cW9q2"
+)
+
 func main() {
 	node := electrum.NewNode()
-	if err := node.ConnectTCP("btc.mustyoshi.com:50001"); err != nil {
+	if err := node.ConnectTCP(serverAddr); err != nil {
 		log.Fatal(err)
 	}
 
@@ -36,12 +44,6 @@ func main() {
 	}
 	log.Printf("Peers: %+v", peers)
 
-	numblocks, err := node.BlockchainNumBlocksSubscribe()
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("Numblocks: %+v", numblocks)
-
 	headerChan, err := node.BlockchainHeadersSubscribe()
 	if err != nil {
 		log.Fatal(err)
@@ -52,7 +54,7 @@ func main() {
 		}
 	}()
 
-	hashChan, err := node.BlockchainAddressSubscribe("1NS17iag9jJgTHD1VXjvLCEnZuQ3rJDE9L")
+	hashChan, err := node.BlockchainAddressSubscribe(bitcoinAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,28 +64,34 @@ func main() {
 		}
 	}()
 
-	history, err := node.BlockchainAddressGetHistory("1NS17iag9jJgTHD1VXjvLCEnZuQ3rJDE9L")
+	history, err := node.BlockchainAddressGetHistory(bitcoinAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Address history: %+v", history)
 
-	transaction, err := node.BlockchainTransactionGet("0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098")
+	transaction, err := node.BlockchainTransactionGet("3b885123e87a6f7dbaf1e3bd9e4bf63f1c6d09a6e00ac651596ba56f4d99e85c")
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Transaction: %s", transaction)
 
-	transactions, err := node.BlockchainAddressListUnspent("1NS17iag9jJgTHD1VXjvLCEnZuQ3rJDE9L")
+	transactions, err := node.BlockchainAddressListUnspent(bitcoinAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Unspent transactions: %+v", transactions)
 
 	// TODO(d4l3k) seems to not work, need to subscribe first maybe?
-	balance, err := node.BlockchainAddressGetBalance("1NS17iag9jJgTHD1VXjvLCEnZuQ3rJDE9L")
+	balance, err := node.BlockchainAddressGetBalance(bitcoinAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Address balance: %+v", balance)
+
+	// now you can deposit some coins to the bitcoinAddress,
+	// or deposit/withdraw some coins to your specified address.
+	// waite a moment and you will get notification from server
+	// about balance and transaction.
+	time.Sleep(15 * time.Minute)
 }

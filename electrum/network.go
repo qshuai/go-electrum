@@ -9,11 +9,6 @@ import (
 	"sync"
 )
 
-const (
-	ClientVersion   = "0.0.1"
-	ProtocolVersion = "1.0"
-)
-
 var (
 	ErrNotImplemented = errors.New("not implemented")
 	ErrNodeConnected  = errors.New("node already connected")

@@ -4,7 +4,7 @@ package electrum
 // http://docs.electrum.org/en/latest/protocol.html#server-version
 func (n *Node) ServerVersion() (string, error) {
 	resp := &basicResp{}
-	err := n.request("server.version", []string{ClientVersion, ProtocolVersion}, resp)
+	err := n.request("server.version", []string{}, resp)
 	return resp.Result, err
 }
 
@@ -12,7 +12,7 @@ func (n *Node) ServerVersion() (string, error) {
 // http://docs.electrum.org/en/latest/protocol.html#server-banner
 func (n *Node) ServerBanner() (string, error) {
 	resp := &basicResp{}
-	err := n.request("server.banner", nil, resp)
+	err := n.request("server.banner", []string{}, resp)
 	return resp.Result, err
 }
 
@@ -20,7 +20,7 @@ func (n *Node) ServerBanner() (string, error) {
 // http://docs.electrum.org/en/latest/protocol.html#server-donation-address
 func (n *Node) ServerDonationAddress() (string, error) {
 	resp := &basicResp{}
-	err := n.request("server.donation_address", nil, resp)
+	err := n.request("server.donation_address", []string{}, resp)
 	return resp.Result, err
 }
 
@@ -30,6 +30,6 @@ func (n *Node) ServerPeersSubscribe() ([][]interface{}, error) {
 	resp := &struct {
 		Peers [][]interface{} `json:"result"`
 	}{}
-	err := n.request("server.peers.subscribe", nil, resp)
+	err := n.request("server.peers.subscribe", []string{}, resp)
 	return resp.Peers, err
 }
