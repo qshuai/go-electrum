@@ -9,15 +9,15 @@ import (
 	"log"
 	"time"
 
-	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcwallet/netparams"
-	"github.com/btcsuite/btcwallet/waddrmgr"
-	"github.com/btcsuite/btcwallet/wallet"
-	"github.com/btcsuite/btcwallet/walletdb"
-	"github.com/btcsuite/btcwallet/wtxmgr"
-	"github.com/d4l3k/go-electrum/electrum"
+	"github.com/bcext/cashutil"
+	"github.com/bcext/cashwallet/netparams"
+	"github.com/bcext/cashwallet/waddrmgr"
+	"github.com/bcext/cashwallet/wallet"
+	"github.com/bcext/cashwallet/walletdb"
+	"github.com/bcext/cashwallet/wtxmgr"
+	"github.com/qshuai/go-electrum/electrum"
 
-	_ "github.com/btcsuite/btcwallet/walletdb/bdb"
+	_ "github.com/bcext/cashwallet/walletdb/bdb"
 )
 
 var (
@@ -33,12 +33,12 @@ type Wallet struct {
 }
 
 // Addresses returns all addresses generated in the current bitcoin wallet.
-func (w *Wallet) Addresses() ([]btcutil.Address, error) {
+func (w *Wallet) Addresses() ([]cashutil.Address, error) {
 	acc, err := w.wallet.Manager.LastAccount()
 	if err != nil {
 		return nil, err
 	}
-	var addrs []btcutil.Address
+	var addrs []cashutil.Address
 	err = w.wallet.Manager.ForEachAccountAddress(acc, func(maddr waddrmgr.ManagedAddress) error {
 		addrs = append(addrs, maddr.Address())
 		return nil
@@ -50,7 +50,7 @@ func (w *Wallet) Addresses() ([]btcutil.Address, error) {
 }
 
 // GenAddresses generates a number of addresses for the wallet.
-func (w *Wallet) GenAddresses(n int) ([]btcutil.Address, error) {
+func (w *Wallet) GenAddresses(n int) ([]cashutil.Address, error) {
 	acc, err := w.wallet.Manager.LastAccount()
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (w *Wallet) GenAddresses(n int) ([]btcutil.Address, error) {
 }
 
 // SendBitcoin sends some amount of bitcoin specifying minimum confirmations.
-func (w *Wallet) SendBitcoin(amounts map[string]btcutil.Amount, minconf int) error {
+func (w *Wallet) SendBitcoin(amounts map[string]cashutil.Amount, minconf int) error {
 	account, err := w.wallet.Manager.LastAccount()
 	if err != nil {
 		return err
@@ -118,8 +118,8 @@ func (w *Wallet) SendBitcoin(amounts map[string]btcutil.Amount, minconf int) err
 	return nil
 }
 
-func stripManagedAddrs(mAddrs []waddrmgr.ManagedAddress) []btcutil.Address {
-	addrs := make([]btcutil.Address, len(mAddrs))
+func stripManagedAddrs(mAddrs []waddrmgr.ManagedAddress) []cashutil.Address {
+	addrs := make([]cashutil.Address, len(mAddrs))
 	for i, addr := range mAddrs {
 		addrs[i] = addr.Address()
 	}

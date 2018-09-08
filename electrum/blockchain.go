@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/btcsuite/btcutil"
+	"github.com/bcext/cashutil"
 )
 
 // BlockchainNumBlocksSubscribe returns the current number of blocks.
@@ -114,8 +114,8 @@ func (n *Node) BlockchainAddressGetHistory(address string) ([]*Transaction, erro
 func (n *Node) BlockchainAddressGetMempool() error { return ErrNotImplemented }
 
 type Balance struct {
-	Confirmed   btcutil.Amount `json:"confirmed"`
-	Unconfirmed btcutil.Amount `json:"unconfirmed"`
+	Confirmed   cashutil.Amount `json:"confirmed"`
+	Unconfirmed cashutil.Amount `json:"unconfirmed"`
 }
 
 // BlockchainAddressGetBalance returns the balance of an address.
