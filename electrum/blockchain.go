@@ -171,9 +171,9 @@ func (n *Node) BlockchainTransactionGetMerkle() error { return ErrNotImplemented
 
 // BlockchainTransactionGet returns the raw transaction (hex-encoded) for the given txid. If transaction doesn't exist, an error is returned.
 // http://docs.electrum.org/en/latest/protocol.html#blockchain-transaction-get
-func (n *Node) BlockchainTransactionGet(txid string) (string, error) {
+func (n *Node) BlockchainTransactionGet(txid string, verbose bool) (string, error) {
 	resp := &basicResp{}
-	err := n.request("blockchain.transaction.get", []interface{}{txid}, resp)
+	err := n.request("blockchain.transaction.get", []interface{}{txid, verbose}, resp)
 	return resp.Result, err
 }
 

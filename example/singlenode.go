@@ -70,7 +70,7 @@ func main() {
 	}
 	log.Printf("Address history: %+v", history)
 
-	transaction, err := node.BlockchainTransactionGet("3b885123e87a6f7dbaf1e3bd9e4bf63f1c6d09a6e00ac651596ba56f4d99e85c")
+	transaction, err := node.BlockchainTransactionGet("3b885123e87a6f7dbaf1e3bd9e4bf63f1c6d09a6e00ac651596ba56f4d99e85c", true)
 	if err != nil {
 		log.Fatal(err)
 	}
