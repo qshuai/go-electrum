@@ -27,9 +27,9 @@ type respMetadata struct {
 }
 
 type request struct {
-	Id     int      `json:"id"`
-	Method string   `json:"method"`
-	Params []string `json:"params"`
+	Id     int           `json:"id"`
+	Method string        `json:"method"`
+	Params []interface{} `json:"params"`
 }
 
 type basicResp struct {
@@ -145,7 +145,7 @@ func (n *Node) listenPush(method string) <-chan []byte {
 }
 
 // request makes a request to the server and unmarshals the response into v.
-func (n *Node) request(method string, params []string, v interface{}) error {
+func (n *Node) request(method string, params []interface{}, v interface{}) error {
 	msg := request{
 		Id:     n.nextId,
 		Method: method,

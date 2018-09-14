@@ -3,7 +3,6 @@ package electrum
 import (
 	"encoding/json"
 	"log"
-	"strconv"
 
 	"github.com/bcext/cashutil"
 )
@@ -14,7 +13,7 @@ func (n *Node) BlockchainNumBlocksSubscribe() (int, error) {
 	resp := &struct {
 		Result int `json:"result"`
 	}{}
-	err := n.request("blockchain.numblocks.subscribe", []string{}, resp)
+	err := n.request("blockchain.numblocks.subscribe", []interface{}{}, resp)
 	return resp.Result, err
 }
 
@@ -36,7 +35,7 @@ func (n *Node) BlockchainHeadersSubscribe() (<-chan *BlockchainHeader, error) {
 	resp := &struct {
 		Result *BlockchainHeader `json:"result"`
 	}{}
-	if err := n.request("blockchain.headers.subscribe", []string{}, resp); err != nil {
+	if err := n.request("blockchain.headers.subscribe", []interface{}{}, resp); err != nil {
 		return nil, err
 	}
 	headerChan := make(chan *BlockchainHeader, 1)
@@ -63,7 +62,7 @@ func (n *Node) BlockchainHeadersSubscribe() (<-chan *BlockchainHeader, error) {
 // http://docs.electrum.org/en/latest/protocol.html#blockchain-address-subscribe
 func (n *Node) BlockchainAddressSubscribe(address string) (<-chan string, error) {
 	resp := &basicResp{}
-	err := n.request("blockchain.address.subscribe", []string{address}, resp)
+	err := n.request("blockchain.address.subscribe", []interface{}{address}, resp)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +104,7 @@ func (n *Node) BlockchainAddressGetHistory(address string) ([]*Transaction, erro
 	resp := &struct {
 		Result []*Transaction `json:"result"`
 	}{}
-	err := n.request("blockchain.address.get_history", []string{address}, resp)
+	err := n.request("blockchain.address.get_history", []interface{}{address}, resp)
 	return resp.Result, err
 }
 
@@ -125,7 +124,7 @@ func (n *Node) BlockchainAddressGetBalance(address string) (*Balance, error) {
 	resp := &struct {
 		Result *Balance `json:"result"`
 	}{}
-	err := n.request("blockchain.address.get_balance", []string{address}, resp)
+	err := n.request("blockchain.address.get_balance", []interface{}{address}, resp)
 	return resp.Result, err
 }
 
@@ -139,7 +138,7 @@ func (n *Node) BlockchainAddressListUnspent(address string) ([]*Transaction, err
 	resp := &struct {
 		Result []*Transaction `json:"result"`
 	}{}
-	err := n.request("blockchain.address.listunspent", []string{address}, resp)
+	err := n.request("blockchain.address.listunspent", []interface{}{address}, resp)
 	return resp.Result, err
 }
 
@@ -162,7 +161,7 @@ func (n *Node) BlockchainTransactionBroadcast(tx []byte) (interface{}, error) {
 	resp := &struct {
 		Result interface{} `json:"result"`
 	}{}
-	err := n.request("blockchain.transaction.broadcast", []string{string(tx)}, resp)
+	err := n.request("blockchain.transaction.broadcast", []interface{}{string(tx)}, resp)
 	return resp.Result, err
 }
 
@@ -174,7 +173,7 @@ func (n *Node) BlockchainTransactionGetMerkle() error { return ErrNotImplemented
 // http://docs.electrum.org/en/latest/protocol.html#blockchain-transaction-get
 func (n *Node) BlockchainTransactionGet(txid string) (string, error) {
 	resp := &basicResp{}
-	err := n.request("blockchain.transaction.get", []string{txid}, resp)
+	err := n.request("blockchain.transaction.get", []interface{}{txid}, resp)
 	return resp.Result, err
 }
 
@@ -184,6 +183,6 @@ func (n *Node) BlockchainEstimateFee(block int) (float64, error) {
 	resp := &struct {
 		Result float64 `json:"result"`
 	}{}
-	err := n.request("blockchain.estimatefee", []string{strconv.Itoa(block)}, resp)
+	err := n.request("blockchain.estimatefee", []interface{}{block}, resp)
 	return resp.Result, err
 }
