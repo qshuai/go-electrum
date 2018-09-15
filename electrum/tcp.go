@@ -42,7 +42,6 @@ func NewSSLTransport(addr string, config *tls.Config) (*TCPTransport, error) {
 }
 
 func (t *TCPTransport) SendMessage(body []byte) error {
-	log.Printf("%s <- %s", t.conn.RemoteAddr(), body)
 	_, err := t.conn.Write(body)
 	return err
 }
@@ -59,7 +58,6 @@ func (t *TCPTransport) listen() {
 			log.Printf("error %s", err)
 			break
 		}
-		log.Printf("%s -> %s", t.conn.RemoteAddr(), line)
 		t.responses <- line
 	}
 }
