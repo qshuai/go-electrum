@@ -2,8 +2,10 @@ package electrum
 
 // ServerVersion returns the server's version.
 // http://docs.electrum.org/en/latest/protocol.html#server-version
-func (n *Node) ServerVersion() (string, error) {
-	resp := &basicResp{}
+func (n *Node) ServerVersion() ([]string, error) {
+	resp := &struct {
+		Result []string `json:"result"`
+	}{}
 	err := n.request("server.version", []interface{}{}, resp)
 	return resp.Result, err
 }

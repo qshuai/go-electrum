@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -24,25 +25,25 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Version: %s\n\n", version)
+	fmt.Printf("Version: %v\n\n", version)
 
 	banner, err := node.ServerBanner()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Banner: %s\n\n", banner)
+	fmt.Printf("Banner: %s\n\n", banner)
 
 	address, err := node.ServerDonationAddress()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Address: %s\n\n", address)
+	fmt.Printf("Address: %s\n\n", address)
 
 	peers, err := node.ServerPeersSubscribe()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Peers: %+v\n\n", peers)
+	fmt.Printf("Peers: %+v\n\n", peers)
 
 	headerChan, err := node.BlockchainHeadersSubscribe()
 	if err != nil {
@@ -50,7 +51,7 @@ func main() {
 	}
 	go func() {
 		for header := range headerChan {
-			log.Printf("Headers: %+v\n\n", header)
+			fmt.Printf("Headers: %+v\n\n", header)
 		}
 	}()
 
@@ -60,7 +61,7 @@ func main() {
 	}
 	go func() {
 		for hash := range hashChan {
-			log.Printf("Address history hash: %+v\n\n", hash)
+			fmt.Printf("Address history hash: %+v\n\n", hash)
 		}
 	}()
 
@@ -68,26 +69,26 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Address history: %+v\n\n", history)
+	fmt.Printf("Address history: %+v\n\n", history)
 
 	transaction, err := node.BlockchainTransactionGet("3b885123e87a6f7dbaf1e3bd9e4bf63f1c6d09a6e00ac651596ba56f4d99e85c", true)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Transaction: %+v\n\n", transaction)
+	fmt.Printf("Transaction: %+v\n\n", transaction)
 
 	transactions, err := node.BlockchainAddressListUnspent(bitcoinAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Unspent transactions: %+v\n\n", transactions)
+	fmt.Printf("Unspent transactions: %+v\n\n", transactions)
 
 	// TODO(d4l3k) seems to not work, need to subscribe first maybe?
 	balance, err := node.BlockchainAddressGetBalance(bitcoinAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Address balance: %+v\n\n", balance)
+	fmt.Printf("Address balance: %+v\n\n", balance)
 
 	// now you can deposit some coins to the bitcoinAddress,
 	// or deposit/withdraw some coins to your specified address.
