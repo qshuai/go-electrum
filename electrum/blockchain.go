@@ -169,12 +169,96 @@ func (n *Node) BlockchainTransactionBroadcast(tx []byte) (interface{}, error) {
 // http://docs.electrum.org/en/latest/protocol.html#blockchain-transaction-get-merkle
 func (n *Node) BlockchainTransactionGetMerkle() error { return ErrNotImplemented }
 
+type GetTransaction struct {
+	Hex           string `json:"hex"`
+	Txid          string `json:"txid"`
+	Version       int32  `json:"version"`
+	Locktime      uint32 `json:"locktime"`
+	Vin           []Vin  `json:"vin"`
+	Vout          []Vout `json:"vout"`
+	BlockHash     string `json:"blockhash"`
+	Confirmations int32  `json:"confirmations"`
+	Time          int64  `json:"time"`
+	Blocktime     int64  `json:"blocktime"`
+}
+
+// Vin models parts of the tx data.  It is defined separately since
+// getrawtransaction, decoderawtransaction, and searchrawtransaction use the
+// same structure.
+type Vin struct {
+	Coinbase  string     `json:"coinbase"`
+	Txid      string     `json:"txid"`
+	Vout      uint32     `json:"vout"`
+	ScriptSig *ScriptSig `json:"scriptSig"`
+	Sequence  uint32     `json:"sequence"`
+}
+
+// ScriptSig models a signature script.  It is defined separately since it only
+// applies to non-coinbase.  Therefore the field in the Vin structure needs
+// to be a pointer.
+type ScriptSig struct {
+	Asm string `json:"asm"`
+	Hex string `json:"hex"`
+}
+
+// IsCoinBase returns a bool to show if a Vin is a Coinbase one or not.
+func (v *Vin) IsCoinBase() bool {
+	return len(v.Coinbase) > 0
+}
+
+// MarshalJSON provides a custom Marshal method for Vin.
+func (v *Vin) MarshalJSON() ([]byte, error) {
+	if v.IsCoinBase() {
+		coinbaseStruct := struct {
+			Coinbase string `json:"coinbase"`
+			Sequence uint32 `json:"sequence"`
+		}{
+			Coinbase: v.Coinbase,
+			Sequence: v.Sequence,
+		}
+		return json.Marshal(coinbaseStruct)
+	}
+
+	txStruct := struct {
+		Txid      string     `json:"txid"`
+		Vout      uint32     `json:"vout"`
+		ScriptSig *ScriptSig `json:"scriptSig"`
+		Sequence  uint32     `json:"sequence"`
+	}{
+		Txid:      v.Txid,
+		Vout:      v.Vout,
+		ScriptSig: v.ScriptSig,
+		Sequence:  v.Sequence,
+	}
+	return json.Marshal(txStruct)
+}
+
+// ScriptPubKeyResult models the scriptPubKey data of a tx script.  It is
+// defined separately since it is used by multiple commands.
+type ScriptPubKeyResult struct {
+	Asm       string   `json:"asm"`
+	Hex       string   `json:"hex,omitempty"`
+	ReqSigs   int32    `json:"reqSigs,omitempty"`
+	Type      string   `json:"type"`
+	Addresses []string `json:"addresses,omitempty"`
+}
+
+// Vout models parts of the tx data.  It is defined separately since both
+// getrawtransaction and decoderawtransaction use the same structure.
+type Vout struct {
+	Value        float64            `json:"value"`
+	N            uint32             `json:"n"`
+	ScriptPubKey ScriptPubKeyResult `json:"scriptPubKey"`
+}
+
 // BlockchainTransactionGet returns the raw transaction (hex-encoded) for the given txid. If transaction doesn't exist, an error is returned.
 // http://docs.electrum.org/en/latest/protocol.html#blockchain-transaction-get
-func (n *Node) BlockchainTransactionGet(txid string, verbose bool) (string, error) {
-	resp := &basicResp{}
+func (n *Node) BlockchainTransactionGet(txid string, verbose bool) (*GetTransaction, error) {
+	resp := &struct {
+		Result GetTransaction `json:"result"`
+	}{}
 	err := n.request("blockchain.transaction.get", []interface{}{txid, verbose}, resp)
-	return resp.Result, err
+	return &resp.Result, err
 }
 
 // http://docs.electrum.org/en/latest/protocol.html#blockchain-estimatefee
