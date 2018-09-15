@@ -9,9 +9,12 @@ import (
 )
 
 var (
-	// Should specify a available server(IP:PORT)
+	// Should specify a available server(IP:PORT) if connecting to the
+	// following server failed.
 	serverAddr = "39.104.125.149:9629"
 
+	// A bitcoin testnet address which should be consistent with the server
+	// network type
 	bitcoinAddress = "n4FyJMDYXJmPEm7cffFLrwLXvGWn8cW9q2"
 )
 
