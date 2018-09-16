@@ -9,6 +9,8 @@ import (
 	"sync"
 )
 
+const delim = byte('\n')
+
 var (
 	ErrNotImplemented = errors.New("not implemented")
 	ErrNodeConnected  = errors.New("node already connected")
@@ -54,6 +56,7 @@ func NewNode() *Node {
 		handlers:     make(map[int]chan []byte),
 		pushHandlers: make(map[string][]chan []byte),
 	}
+
 	return n
 }
 
@@ -62,6 +65,7 @@ func (n *Node) ConnectTCP(addr string) error {
 	if n.transport != nil {
 		return ErrNodeConnected
 	}
+
 	transport, err := NewTCPTransport(addr)
 	if err != nil {
 		return err

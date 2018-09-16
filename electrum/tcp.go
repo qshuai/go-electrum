@@ -3,7 +3,6 @@ package electrum
 import (
 	"bufio"
 	"crypto/tls"
-	"log"
 	"net"
 )
 
@@ -18,12 +17,14 @@ func NewTCPTransport(addr string) (*TCPTransport, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	t := &TCPTransport{
 		conn:      conn,
 		responses: make(chan []byte),
 		errors:    make(chan error),
 	}
 	go t.listen()
+
 	return t, nil
 }
 
@@ -32,6 +33,7 @@ func NewSSLTransport(addr string, config *tls.Config) (*TCPTransport, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	t := &TCPTransport{
 		conn:      conn,
 		responses: make(chan []byte),
@@ -46,16 +48,14 @@ func (t *TCPTransport) SendMessage(body []byte) error {
 	return err
 }
 
-const delim = byte('\n')
-
 func (t *TCPTransport) listen() {
 	defer t.conn.Close()
 	reader := bufio.NewReader(t.conn)
 	for {
+		// TODO deal with io.EOF resulting in os.Exist(1)
 		line, err := reader.ReadBytes(delim)
 		if err != nil {
 			t.errors <- err
-			log.Printf("error %s", err)
 			break
 		}
 		t.responses <- line

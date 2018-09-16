@@ -58,3 +58,9 @@ func (n *Node) ServerVersion() ([]string, error) {
 	err := n.request("server.version", []interface{}{}, resp)
 	return resp.Result, err
 }
+
+func (n *Node) Ping() error {
+	err := n.request("server.ping", []interface{}{}, nil)
+
+	return err
+}
