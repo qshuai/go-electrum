@@ -180,18 +180,20 @@ func (n *Node) BlockchainAddressSubscribe(address string) (<-chan string, error)
 				Params []string `json:"params"`
 			}{}
 			if err := json.Unmarshal(msg, resp); err != nil {
-				log.Printf("ERR %s", err)
+				// TODO handle error. Notify the error for caller about that electrum server
+				// will not track the balance change for the param address
 				return
 			}
 			if len(resp.Params) != 2 {
-				log.Printf("address subscription params len != 2 %+v", resp.Params)
 				continue
 			}
+
 			if resp.Params[0] == address {
 				addressChan <- resp.Params[1]
 			}
 		}
 	}()
+
 	return addressChan, err
 }
 

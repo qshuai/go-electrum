@@ -52,7 +52,10 @@ func (t *TCPTransport) listen() {
 	defer t.conn.Close()
 	reader := bufio.NewReader(t.conn)
 	for {
-		// TODO deal with io.EOF resulting in os.Exist(1)
+		// The Node should send server.ping request continuously with a
+		// reasonable break in order to keep connection alive. If not
+		// client will receive a disconnection error and encounter
+		// io.EOF with following os.Exit(1).
 		line, err := reader.ReadBytes(delim)
 		if err != nil {
 			t.errors <- err
