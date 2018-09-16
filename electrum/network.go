@@ -37,8 +37,6 @@ type basicResp struct {
 }
 
 type Node struct {
-	Address string
-
 	transport    Transport
 	handlers     map[int]chan []byte
 	handlersLock sync.RWMutex
@@ -63,7 +61,6 @@ func (n *Node) ConnectTCP(addr string) error {
 	if n.transport != nil {
 		return ErrNodeConnected
 	}
-	n.Address = addr
 	transport, err := NewTCPTransport(addr)
 	if err != nil {
 		return err
@@ -78,7 +75,6 @@ func (n *Node) ConnectSSL(addr string, config *tls.Config) error {
 	if n.transport != nil {
 		return ErrNodeConnected
 	}
-	n.Address = addr
 	transport, err := NewSSLTransport(addr, config)
 	if err != nil {
 		return err
