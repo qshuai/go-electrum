@@ -86,7 +86,6 @@ func main() {
 	}
 	fmt.Printf("Unspent transactions: %+v\n\n", transactions)
 
-	// TODO(d4l3k) seems to not work, need to subscribe first maybe?
 	balance, err := node.BlockchainAddressGetBalance(bitcoinAddress)
 	if err != nil {
 		log.Fatal(err)
