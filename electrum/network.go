@@ -37,12 +37,13 @@ type basicResp struct {
 }
 
 type Node struct {
-	transport    Transport
-	handlers     map[int]chan []byte
-	handlersLock sync.RWMutex
+	transport Transport
 
-	pushHandlers     map[string][]chan []byte
+	handlersLock sync.RWMutex
+	handlers     map[int]chan []byte
+
 	pushHandlersLock sync.RWMutex
+	pushHandlers     map[string][]chan []byte
 
 	nextId int
 }
