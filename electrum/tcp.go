@@ -3,8 +3,11 @@ package electrum
 import (
 	"bufio"
 	"crypto/tls"
+	"log"
 	"net"
 )
+
+var DebugMode bool
 
 type TCPTransport struct {
 	conn      net.Conn
@@ -44,6 +47,10 @@ func NewSSLTransport(addr string, config *tls.Config) (*TCPTransport, error) {
 }
 
 func (t *TCPTransport) SendMessage(body []byte) error {
+	if DebugMode {
+		log.Printf("%s <- %s", t.conn.RemoteAddr(), body)
+	}
+
 	_, err := t.conn.Write(body)
 	return err
 }
@@ -61,6 +68,10 @@ func (t *TCPTransport) listen() {
 			t.errors <- err
 			break
 		}
+		if DebugMode {
+			log.Printf("%s -> %s", t.conn.RemoteAddr(), line)
+		}
+
 		t.responses <- line
 	}
 }
