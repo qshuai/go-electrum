@@ -174,8 +174,11 @@ func (n *Node) request(method string, params []interface{}, v interface{}) error
 	defer n.handlersLock.Unlock()
 	delete(n.handlers, msg.Id)
 
-	if err := json.Unmarshal(resp, v); err != nil {
-		return nil
+	if v != nil {
+		if err := json.Unmarshal(resp, v); err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
