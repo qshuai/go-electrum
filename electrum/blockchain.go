@@ -59,6 +59,10 @@ func (n *Node) BlockchainRelayfee() error {
 }
 
 type Balance struct {
+	// Address field is unnecessary for Electrumx server protocol,
+	// but is required for user of this library.
+	Address string `json:"address"`
+
 	Confirmed   cashutil.Amount `json:"confirmed"`
 	Unconfirmed cashutil.Amount `json:"unconfirmed"`
 }
@@ -81,6 +85,7 @@ func (n *Node) BlockchainAddressGetBalance(address string) (*Balance, error) {
 		Result *Balance `json:"result"`
 	}{}
 	err := n.request("blockchain.address.get_balance", []interface{}{address}, resp)
+	resp.Result.Address = address
 	return resp.Result, err
 }
 
