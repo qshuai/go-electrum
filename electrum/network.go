@@ -23,9 +23,14 @@ type Transport interface {
 }
 
 type respMetadata struct {
-	Id     int    `json:"id"`
-	Method string `json:"method"`
-	Error  string `json:"error"`
+	Id     int     `json:"id"`
+	Method string  `json:"method"`
+	Error  *APIErr `json:"error"`
+}
+
+type APIErr struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 type request struct {
@@ -108,7 +113,7 @@ func (n *Node) listen() {
 				n.err(err)
 				return
 			}
-			if len(msg.Error) > 0 {
+			if msg.Error != nil {
 				n.err(fmt.Errorf("error from server: %#v", msg.Error))
 				return
 			}
