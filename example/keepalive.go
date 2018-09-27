@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	electrum.DebugMode = true
+
 	node := electrum.NewNode()
 
 	// The hard code for connection server as for can not reference to the

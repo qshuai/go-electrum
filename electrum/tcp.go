@@ -79,6 +79,7 @@ func (t *TCPTransport) listen() {
 func (t *TCPTransport) Responses() <-chan []byte {
 	return t.responses
 }
+
 func (t *TCPTransport) Errors() <-chan error {
 	return t.errors
 }
