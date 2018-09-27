@@ -55,7 +55,7 @@ func (n *Node) ServerVersion() ([]string, error) {
 	resp := &struct {
 		Result []string `json:"result"`
 	}{}
-	err := n.request("server.version", []interface{}{}, resp)
+	err := n.request("server.version111", []interface{}{}, resp)
 	return resp.Result, err
 }
 

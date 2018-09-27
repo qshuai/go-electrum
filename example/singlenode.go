@@ -19,6 +19,8 @@ var (
 )
 
 func main() {
+	electrum.DebugMode = true
+
 	node := electrum.NewNode()
 	if err := node.ConnectTCP(serverAddr); err != nil {
 		log.Fatal(err)

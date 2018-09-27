@@ -330,6 +330,7 @@ func (n *Node) BlockchainHeadersSubscribe() (<-chan *BlockchainHeader, error) {
 				Params []*BlockchainHeader `json:"params"`
 			}{}
 			if err := json.Unmarshal(msg, resp); err != nil {
+				// TODO: deal with error
 				log.Printf("ERR %s", err)
 				return
 			}

@@ -14,6 +14,17 @@ func main() {
 
 	node := electrum.NewNode()
 
+	go func() {
+		for {
+			select {
+			case <-node.Error:
+				log.Println("node shutdown")
+			default:
+
+			}
+		}
+	}()
+
 	// The hard code for connection server as for can not reference to the
 	// variable `serverAddr` via the command `go run keepalive.go`. You
 	// should to update it if not available.

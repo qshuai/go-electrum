@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
+	"log"
 	"sync"
 	"sync/atomic"
 )
@@ -13,6 +14,7 @@ const delim = byte('\n')
 var (
 	ErrNotImplemented = errors.New("not implemented")
 	ErrNodeConnected  = errors.New("node already connected")
+	ErrNodeShutdown   = errors.New("node has shutdown")
 )
 
 type Transport interface {
@@ -51,6 +53,9 @@ type Node struct {
 	pushHandlersLock sync.RWMutex
 	pushHandlers     map[string][]chan []byte
 
+	Error chan error
+	quit  chan struct{}
+
 	// nextId tags a request, and get the same id from server result.
 	// Should be atomic operation for concurrence.
 	// notice the max request limit, if reach to the max times,
@@ -63,6 +68,9 @@ func NewNode() *Node {
 	n := &Node{
 		handlers:     make(map[uint64]chan []byte),
 		pushHandlers: make(map[string][]chan []byte),
+
+		Error: make(chan error),
+		quit:  make(chan struct{}),
 	}
 
 	return n
@@ -101,16 +109,23 @@ func (n *Node) ConnectSSL(addr string, config *tls.Config) error {
 func (n *Node) listen() {
 	for {
 		select {
-		case _ = <-n.transport.Errors():
-			return
+		case err := <-n.transport.Errors():
+			n.Error <- err
+			n.shutdown()
 		case bytes := <-n.transport.Responses():
 			msg := &respMetadata{}
-			if err := json.Unmarshal(bytes, msg); err != nil {
-				return
+			if err := json.Unmarshal(bytes, msg); err != nil && DebugMode {
+				log.Printf("unmarshal received message failed: %v", err)
 			}
-			if msg.Error != nil {
-				return
+
+			// 1. method or params error;
+			// 2. server handle error;
+			// Caller should handle with this error
+			if msg.Error != nil && DebugMode {
+				log.Printf("errors returned from electrum server: %v", msg.Error)
 			}
+
+			// subscribe message if returned message with 'method' field
 			if len(msg.Method) > 0 {
 				n.pushHandlersLock.RLock()
 				handlers := n.pushHandlers[msg.Method]
@@ -146,6 +161,12 @@ func (n *Node) listenPush(method string) <-chan []byte {
 
 // request makes a request to the server and unmarshals the response into v.
 func (n *Node) request(method string, params []interface{}, v interface{}) error {
+	select {
+	case <-n.quit:
+		return ErrNodeShutdown
+	default:
+	}
+
 	msg := request{
 		Id:     atomic.LoadUint64(&n.nextId),
 		Method: method,
@@ -181,4 +202,12 @@ func (n *Node) request(method string, params []interface{}, v interface{}) error
 	}
 
 	return nil
+}
+
+func (n *Node) shutdown() {
+	close(n.quit)
+
+	n.transport = nil
+	n.handlers = nil
+	n.pushHandlers = nil
 }

@@ -65,6 +65,7 @@ func (t *TCPTransport) listen() {
 		// io.EOF with following os.Exit(1).
 		line, err := reader.ReadBytes(delim)
 		if err != nil {
+			// block until start handle error
 			t.errors <- err
 			break
 		}
