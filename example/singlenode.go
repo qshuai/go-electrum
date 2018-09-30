@@ -26,6 +26,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//Send server.ping request in order to keep alive connection to
+	//electrum server
+	go func() {
+		for {
+			if err := node.Ping(); err != nil {
+				log.Fatal(err)
+			}
+
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
 	version, err := node.ServerVersion()
 	if err != nil {
 		log.Fatal(err)
@@ -94,18 +106,6 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf("Address balance: %+v\n\n", balance)
-
-	// Send server.ping request in order to keep alive connection to
-	// electrum server
-	go func() {
-		for {
-			if err := node.Ping(); err != nil {
-				log.Fatal(err)
-			}
-
-			time.Sleep(5 * time.Second)
-		}
-	}()
 
 	// Now you can deposit some coins to the bitcoinAddress,
 	// or deposit/withdraw some coins to your specified address.

@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"sync"
 	"sync/atomic"
@@ -25,7 +26,7 @@ type Transport interface {
 	Errors() <-chan error
 }
 
-type respMetadata struct {
+type response struct {
 	Id     uint64  `json:"id"`
 	Method string  `json:"method"`
 	Error  *APIErr `json:"error"`
@@ -34,6 +35,10 @@ type respMetadata struct {
 type APIErr struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+}
+
+func (e *APIErr) Error() string {
+	return fmt.Sprintf("errorNo: %d, errMsg: %s", e.Code, e.Message)
 }
 
 type request struct {
@@ -46,14 +51,19 @@ type basicResp struct {
 	Result string `json:"result"`
 }
 
+type container struct {
+	content []byte
+	err     error
+}
+
 type Node struct {
 	transport Transport
 
 	handlersLock sync.RWMutex
-	handlers     map[uint64]chan []byte
+	handlers     map[uint64]chan *container
 
 	pushHandlersLock sync.RWMutex
-	pushHandlers     map[string][]chan []byte
+	pushHandlers     map[string][]chan *container
 
 	Error chan error
 	quit  chan struct{}
@@ -68,8 +78,8 @@ type Node struct {
 // NewNode creates a new node.
 func NewNode() *Node {
 	n := &Node{
-		handlers:     make(map[uint64]chan []byte),
-		pushHandlers: make(map[string][]chan []byte),
+		handlers:     make(map[uint64]chan *container),
+		pushHandlers: make(map[string][]chan *container),
 
 		Error: make(chan error),
 		quit:  make(chan struct{}),
@@ -115,16 +125,17 @@ func (n *Node) listen() {
 			n.Error <- err
 			n.shutdown()
 		case bytes := <-n.transport.Responses():
-			msg := &respMetadata{}
-			if err := json.Unmarshal(bytes, msg); err != nil && DebugMode {
-				log.Printf("unmarshal received message failed: %v", err)
+			result := &container{
+				content: bytes,
 			}
 
-			// 1. method or params error;
-			// 2. server handle error;
-			// Caller should handle with this error
-			if msg.Error != nil && DebugMode {
-				log.Printf("errors returned from electrum server: %v", msg.Error)
+			msg := &response{}
+			if err := json.Unmarshal(bytes, msg); err != nil {
+				if DebugMode {
+					log.Printf("unmarshal received message failed: %v", err)
+				}
+
+				result.err = fmt.Errorf("unmarshal received message failed: %v", err)
 			}
 
 			// subscribe message if returned message with 'method' field
@@ -135,7 +146,7 @@ func (n *Node) listen() {
 
 				for _, handler := range handlers {
 					select {
-					case handler <- bytes:
+					case handler <- result:
 					default:
 					}
 				}
@@ -146,18 +157,19 @@ func (n *Node) listen() {
 			n.handlersLock.RUnlock()
 
 			if ok {
-				c <- bytes
+				c <- result
 			}
 		}
 	}
 }
 
 // listenPush returns a channel of messages matching the method.
-func (n *Node) listenPush(method string) <-chan []byte {
-	c := make(chan []byte, 1)
+func (n *Node) listenPush(method string) <-chan *container {
+	c := make(chan *container, 1)
 	n.pushHandlersLock.Lock()
-	defer n.pushHandlersLock.Unlock()
 	n.pushHandlers[method] = append(n.pushHandlers[method], c)
+	n.pushHandlersLock.Unlock()
+
 	return c
 }
 
@@ -184,13 +196,13 @@ func (n *Node) request(method string, params []interface{}, v interface{}) error
 		return err
 	}
 
-	c := make(chan []byte, 1)
+	c := make(chan *container, 1)
 
 	n.handlersLock.Lock()
 	n.handlers[msg.Id] = c
 	n.handlersLock.Unlock()
 
-	var resp []byte
+	var resp *container
 	select {
 	case resp = <-c:
 	case <-time.After(5 * time.Second):
@@ -198,16 +210,17 @@ func (n *Node) request(method string, params []interface{}, v interface{}) error
 	}
 
 	n.handlersLock.Lock()
-	defer n.handlersLock.Unlock()
 	delete(n.handlers, msg.Id)
+	n.handlersLock.Unlock()
 
 	if v != nil {
-		if err := json.Unmarshal(resp, v); err != nil {
+		err = json.Unmarshal(resp.content, v)
+		if err != nil {
 			return err
 		}
 	}
 
-	return nil
+	return resp.err
 }
 
 func (n *Node) shutdown() {

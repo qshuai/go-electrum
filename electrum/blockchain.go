@@ -2,7 +2,6 @@ package electrum
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/bcext/cashutil"
 )
@@ -181,10 +180,14 @@ func (n *Node) BlockchainAddressSubscribe(address string) (<-chan string, error)
 	}
 	go func() {
 		for msg := range n.listenPush("blockchain.address.subscribe") {
+			if msg.err != nil {
+				return
+			}
+
 			resp := &struct {
 				Params []string `json:"params"`
 			}{}
-			if err := json.Unmarshal(msg, resp); err != nil {
+			if err := json.Unmarshal(msg.content, resp); err != nil {
 				// TODO handle error. Notify the error for caller about that electrum server
 				// will not track the balance change for the param address
 				return
@@ -326,12 +329,15 @@ func (n *Node) BlockchainHeadersSubscribe() (<-chan *BlockchainHeader, error) {
 	headerChan <- resp.Result
 	go func() {
 		for msg := range n.listenPush("blockchain.headers.subscribe") {
+			if msg.err != nil {
+				return
+			}
+
 			resp := &struct {
 				Params []*BlockchainHeader `json:"params"`
 			}{}
-			if err := json.Unmarshal(msg, resp); err != nil {
+			if err := json.Unmarshal(msg.content, resp); err != nil {
 				// TODO: deal with error
-				log.Printf("ERR %s", err)
 				return
 			}
 			for _, param := range resp.Params {
