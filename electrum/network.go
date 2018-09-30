@@ -100,6 +100,7 @@ func (n *Node) ConnectTCP(addr string) error {
 	}
 	n.transport = transport
 	go n.listen()
+
 	return nil
 }
 
@@ -114,6 +115,7 @@ func (n *Node) ConnectSSL(addr string, config *tls.Config) error {
 	}
 	n.transport = transport
 	go n.listen()
+
 	return nil
 }
 
@@ -136,6 +138,8 @@ func (n *Node) listen() {
 				}
 
 				result.err = fmt.Errorf("unmarshal received message failed: %v", err)
+			} else {
+				result.err = msg.Error
 			}
 
 			// subscribe message if returned message with 'method' field
@@ -209,6 +213,10 @@ func (n *Node) request(method string, params []interface{}, v interface{}) error
 		return ErrTimeout
 	}
 
+	if resp.err != nil {
+		return resp.err
+	}
+
 	n.handlersLock.Lock()
 	delete(n.handlers, msg.Id)
 	n.handlersLock.Unlock()
@@ -220,7 +228,7 @@ func (n *Node) request(method string, params []interface{}, v interface{}) error
 		}
 	}
 
-	return resp.err
+	return nil
 }
 
 func (n *Node) shutdown() {

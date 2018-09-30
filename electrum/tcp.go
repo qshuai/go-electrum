@@ -44,6 +44,7 @@ func NewSSLTransport(addr string, config *tls.Config) (*TCPTransport, error) {
 		errors:    make(chan error),
 	}
 	go t.listen()
+
 	return t, nil
 }
 

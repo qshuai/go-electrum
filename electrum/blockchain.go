@@ -44,7 +44,11 @@ func (n *Node) BlockchainEstimateFee(block int) (float64, error) {
 		Result float64 `json:"result"`
 	}{}
 	err := n.request("blockchain.estimatefee", []interface{}{block}, resp)
-	return resp.Result, err
+	if err != nil {
+		return 0, err
+	}
+
+	return resp.Result, nil
 }
 
 // TODO implement
@@ -84,8 +88,13 @@ func (n *Node) BlockchainAddressGetBalance(address string) (*Balance, error) {
 		Result *Balance `json:"result"`
 	}{}
 	err := n.request("blockchain.address.get_balance", []interface{}{address}, resp)
+	if err != nil {
+		return nil, err
+	}
+
 	resp.Result.Address = address
-	return resp.Result, err
+
+	return resp.Result, nil
 }
 
 type Transaction struct {
@@ -113,7 +122,11 @@ func (n *Node) BlockchainAddressGetHistory(address string) ([]*Transaction, erro
 		Result []*Transaction `json:"result"`
 	}{}
 	err := n.request("blockchain.address.get_history", []interface{}{address}, resp)
-	return resp.Result, err
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result, nil
 }
 
 // TODO implement
@@ -151,7 +164,11 @@ func (n *Node) BlockchainAddressListUnspent(address string) ([]*Transaction, err
 		Result []*Transaction `json:"result"`
 	}{}
 	err := n.request("blockchain.address.listunspent", []interface{}{address}, resp)
-	return resp.Result, err
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result, nil
 }
 
 // TODO implement
@@ -202,7 +219,7 @@ func (n *Node) BlockchainAddressSubscribe(address string) (<-chan string, error)
 		}
 	}()
 
-	return addressChan, err
+	return addressChan, nil
 }
 
 // TODO implement
@@ -214,7 +231,11 @@ func (n *Node) BlockchainTransactionBroadcast(tx []byte) (interface{}, error) {
 		Result interface{} `json:"result"`
 	}{}
 	err := n.request("blockchain.transaction.broadcast", []interface{}{string(tx)}, resp)
-	return resp.Result, err
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Result, nil
 }
 
 type GetTransaction struct {
@@ -304,7 +325,11 @@ func (n *Node) BlockchainTransactionGet(txid string, verbose bool) (*GetTransact
 		Result GetTransaction `json:"result"`
 	}{}
 	err := n.request("blockchain.transaction.get", []interface{}{txid, verbose}, resp)
-	return &resp.Result, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp.Result, nil
 }
 
 // TODO implement
@@ -345,5 +370,6 @@ func (n *Node) BlockchainHeadersSubscribe() (<-chan *BlockchainHeader, error) {
 			}
 		}
 	}()
+
 	return headerChan, nil
 }
