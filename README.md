@@ -31,6 +31,9 @@ import (
 )
 
 func main() {
+    // turn on debug mode
+    electrum.DebugMode = true
+
 	node := electrum.NewNode()
     // the specified ip is testnet server
 	if err := node.ConnectTCP("39.104.125.149:9629"); err != nil {
