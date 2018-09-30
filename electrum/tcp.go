@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net"
+	"time"
 )
 
 var DebugMode bool
@@ -48,7 +49,7 @@ func NewSSLTransport(addr string, config *tls.Config) (*TCPTransport, error) {
 
 func (t *TCPTransport) SendMessage(body []byte) error {
 	if DebugMode {
-		log.Printf("%s <- %s", t.conn.RemoteAddr(), body)
+		log.Printf("%s [debug] %s <- %s", time.Now().Format("2006-01-02 15:04:05"), t.conn.RemoteAddr(), body)
 	}
 
 	_, err := t.conn.Write(body)
@@ -70,7 +71,7 @@ func (t *TCPTransport) listen() {
 			break
 		}
 		if DebugMode {
-			log.Printf("%s -> %s", t.conn.RemoteAddr(), line)
+			log.Printf("%s [debug] %s -> %s", time.Now().Format("2006-01-02 15:04:05"), t.conn.RemoteAddr(), line)
 		}
 
 		t.responses <- line
