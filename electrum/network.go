@@ -138,7 +138,7 @@ func (n *Node) listen() {
 				}
 
 				result.err = fmt.Errorf("unmarshal received message failed: %v", err)
-			} else {
+			} else if msg.Error != nil {
 				result.err = msg.Error
 			}
 
