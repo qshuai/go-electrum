@@ -10,8 +10,8 @@ This is very much WIP and has a number of unimplemented methods. This will event
 Packages provided
 
 * [electrum](https://godoc.org/github.com/qshuai/go-electrum/electrum) - Library for using JSON-RPC to talk directly to Electrum servers.
-* [wallet](https://godoc.org/github.com/qshuai/go-electrum/wallet) - A bitcoin wallet built on [btcwallet](https://github.com/btcsuite/btcwallet) with Electrum as the backend.
-* [irc](https://godoc.org/github.com/qshuai/go-electrum/irc) - A helper module for finding electrum servers using the [#electrum IRC channel](http://docs.electrum.org/en/latest/protocol.html?highlight=irc#server-peers-subscribe) on Freenode.
+* [wallet](https://godoc.org/github.com/qshuai/go-electrum/wallet) - A bitcoin wallet built on [btcwallet](https://github.com/btcsuite/btcwallet) with Electrum as the backend. **Notice: not available at the current vertsion**.
+* [irc](https://godoc.org/github.com/qshuai/go-electrum/irc) - A helper module for finding electrum servers using the [#electrum IRC channel](http://docs.electrum.org/en/latest/protocol.html?highlight=irc#server-peers-subscribe) on Freenode. **Notice: not supported**.
 
 ## Usage
 See [example/](https://github.com/qshuai/go-electrum/tree/master/example) for more.
@@ -32,72 +32,17 @@ import (
 
 func main() {
 	node := electrum.NewNode()
-	if err := node.ConnectTCP("electrum.dragonzone.net:50001"); err != nil {
+    // the specified ip is testnet server
+	if err := node.ConnectTCP("39.104.125.149:9629"); err != nil {
 		log.Fatal(err)
 	}
-	balance, err := node.BlockchainAddressGetBalance("1NS17iag9jJgTHD1VXjvLCEnZuQ3rJDE9L")
+    
+    // please use bitcoin address accordant to the server environment
+	balance, err := node.BlockchainAddressGetBalance("n4FyJMDYXJmPEm7cffFLrwLXvGWn8cW9q2")
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Address balance: %+v", balance)
-}
-```
-
-### wallet [![GoDoc](https://godoc.org/github.com/qshuai/go-electrum/wallet?status.svg)](https://godoc.org/github.com/qshuai/go-electrum/wallet)
-
-```bash
-$ go get -u github.com/qshuai/go-electrum/wallet
-```
-
-```go
-package main
-
-import (
-  "log"
-
-  "github.com/btcsuite/btcutil"
-  "github.com/qshuai/go-electrum/wallet"
-)
-
-func main() {
-  seed, err := hdkeychain.GenerateSeed(hdkeychain.RecommendedSeedLen)
-  if err != nil {
-    log.Fatal(err)
-  }
-  w, err := wallet.Create("test.wallet", "pass", seed)
-  if err != nil {
-    log.Fatal(err)
-  }
-  addrs, err := w.GenAddresses(1)
-  if err != nil {
-    log.Fatal(err)
-  }
-  log.Printf("Address: %s", addrs[0])
-  err = w.SendBitcoin(map[string]btcutil.Amount{
-    "18mS21JLSWJcTwKV8ZEv5SvroKAqkbYfPy": btcutil.NewAmount(1.0),
-  }, 6)
-  if err != nil {
-    log.Fatal(err)
-  }
-}
-```
-
-### irc [![GoDoc](https://godoc.org/github.com/qshuai/go-electrum/irc?status.svg)](https://godoc.org/github.com/qshuai/go-electrum/irc)
-```bash
-$ go get -u github.com/qshuai/go-electrum/irc
-```
-
-```go
-package main
-
-import (
-	"log"
-
-	"github.com/qshuai/go-electrum/irc"
-)
-
-func main() {
-	log.Println(irc.FindElectrumServers())
 }
 ```
 
