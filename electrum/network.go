@@ -186,11 +186,10 @@ func (n *Node) request(method string, params []interface{}, v interface{}) error
 	}
 
 	msg := request{
-		Id:     atomic.LoadUint64(&n.nextId),
+		Id:     atomic.AddUint64(&n.nextId, 1),
 		Method: method,
 		Params: params,
 	}
-	atomic.AddUint64(&n.nextId, 1)
 	bytes, err := json.Marshal(msg)
 	if err != nil {
 		return err
