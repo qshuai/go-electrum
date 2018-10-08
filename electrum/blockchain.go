@@ -220,11 +220,11 @@ func (n *Node) BlockchainAddressSubscribe(address string) (<-chan string, error)
 // Broadcast a transaction to the network.
 //
 // https://electrumx.readthedocs.io/en/latest/protocol-methods.html#blockchain-transaction-broadcast
-func (n *Node) BlockchainTransactionBroadcast(tx []byte) (interface{}, error) {
+func (n *Node) BlockchainTransactionBroadcast(tx string) (interface{}, error) {
 	resp := &struct {
 		Result interface{} `json:"result"`
 	}{}
-	err := n.request("blockchain.transaction.broadcast", []interface{}{string(tx)}, resp)
+	err := n.request("blockchain.transaction.broadcast", []interface{}{tx}, resp)
 	if err != nil {
 		return nil, err
 	}
