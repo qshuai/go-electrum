@@ -3,7 +3,7 @@ This repository is a fork of [d4l3k/go-electrum](https://github.com/d4l3k/go-ele
 
 A pure Go [Electrum](https://electrum.org/) bitcoin library. This makes it easy to write bitcoin based services using Go without having to run a full bitcoin node.
 
-![go-electrum](https://rawgit.com/qshuai/go-electrum/master/media/logo.png)
+![go-electrum](/media/logo.png)
 
 This is very much WIP and has a number of unimplemented methods. This will eventually be rewritten into a more Go-esque library and handle wallet generation.
 
